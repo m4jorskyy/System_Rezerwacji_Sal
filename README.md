@@ -1,101 +1,128 @@
 # System Rezerwacji Sal
 
-Aplikacja mobilna na platformę Android, umożliwiająca użytkownikom **rezerwację sal w budynkach uczelni lub firmy**. 
+Nowoczesna aplikacja mobilna na platformę Android umożliwiająca efektywne zarządzanie rezerwacjami sal w budynkach uczelni, firm czy instytucji. Aplikacja została zaprojektowana z myślą o intuicyjności użytkowania oraz kompletności funkcjonalności.
 
-Użytkownicy mogą w łatwy sposób przeglądać dostępne terminy, zarządzać swoimi rezerwacjami, a także - jeśli posiadają uprawnienia administratora - dodawać oraz edytować sale.
+## Kluczowe Funkcjonalności
 
-## Funkcjonalności
+### Zarządzanie Użytkownikami
+- **Bezpieczna autoryzacja**: Rejestracja i logowanie z wykorzystaniem REST API
+- **System ról**: Rozróżnienie między zwykłymi użytkownikami a administratorami
+- **Personalizacja**: Indywidualne zarządzanie własnymi rezerwacjami
 
-Aplikacja oferuje kompleksowy zestaw funkcji, zapewniający intuicyjne zarządzanie rezerwacjami:
+### Rezerwacje
+- **Intuicyjne dodawanie**: Wybór daty, czasu i sali w prostym interfejsie
+- **Inteligentne filtrowanie**: Wyświetlanie tylko dostępnych sal w wybranym terminie
+- **Pełne zarządzanie**: Przeglądanie, edytowanie i usuwanie własnych rezerwacji
+- **Gestural UI**: Usuwanie rezerwacji poprzez przeciągnięcie (swipe gesture)
+- **Historia**: Podgląd zarówno aktualnych jak i przeszłych rezerwacji
 
-* **Rejestracja i logowanie użytkowników:** Bezpieczny dostęp do aplikacji.
-* **Przegląd rezerwacji:** Wyświetlanie bieżących i przeszłych rezerwacji.
-* **Dodawanie rezerwacji:**
-    * Wybór daty i czasu.
-    * Filtrowanie dostępnych sal.
-    * Wybór konkretnej sali.
-    * Definiowanie tytułu rezerwacji.
-* **Edytowanie i usuwanie własnych rezerwacji:** Łatwa modyfikacja lub anulowanie rezerwacji (np. poprzez przeciągnięcie w bok).
-* **Zarządzanie salami (tylko dla administratorów):** Dodawanie, edytowanie i usuwanie sal.
-* **Obsługa ról:** Rozróżnienie między użytkownikiem a administratorem, zapewniające odpowiednie uprawnienia.
-* **Prosty i responsywny interfejs:** Oparty na nowoczesnym zestawie narzędzi Jetpack Compose.
+### Zarządzanie Salami (Administratorzy)
+- **CRUD Operations**: Pełne zarządzanie salami (dodawanie, edytowanie, usuwanie)
+- **Kontrola dostępu**: Funkcje dostępne wyłącznie dla użytkowników z uprawnieniami administratora
 
-## Technologie
+## Stack Technologiczny
 
-Projekt został zbudowany z wykorzystaniem najnowszych technologii Androida, zapewniających wydajność i skalowalność:
+### Frontend (Mobile)
+- **Język**: Kotlin
+- **UI Framework**: Jetpack Compose z Material3 Design System
+- **Architektura**: MVVM (Model-View-ViewModel)
+- **State Management**: StateFlow + ViewModel
+- **Navigation**: Jetpack Navigation Compose
 
-* **Język:** Kotlin
-* **Interfejs użytkownika (UI):** Jetpack Compose (Material3)
-* **Architektura:** MVVM (Model-View-ViewModel) z wykorzystaniem `ViewModel` i `StateFlow`
-* **Networking:** Retrofit do obsługi REST API
-* **Zarządzanie stanem:** `ViewModel` + `StateFlow`
-* **Lokalne dane:** `SharedPreferences` (do przechowywania preferencji autoryzacji)
+### Networking & Data
+- **HTTP Client**: Retrofit2 dla komunikacji z REST API
+- **Local Storage**: SharedPreferences (dane autoryzacji)
+- **Data Transfer**: JSON z wykorzystaniem DTO (Data Transfer Objects)
 
-## Wymagania
+### Wymagania Systemowe
+- **Android SDK**: Minimum API 26 (Android 8.0)
+- **Development**: Android Studio Bumblebee lub nowszy
+- **Target**: Współczesne urządzenia Android
 
-Aby uruchomić projekt, upewnij się, że spełniasz następujące wymagania:
+## Instalacja i Uruchomienie
 
-* **Android Studio Bumblebee** lub nowszy.
-* **Android SDK** min. 26.
-* Emulator Androida lub fizyczne urządzenie z systemem Android.
+### Wymagania Wstępne
+```bash
+# Upewnij się, że masz zainstalowane:
+- Android Studio (najnowsza wersja)
+- Android SDK (min. API 26)
+- Emulator Android lub fizyczne urządzenie
+- Git
+```
 
-## Uruchomienie
+### Kroki Instalacji
+```bash
+# 1. Sklonuj repozytorium
+git clone https://github.com/m4jorskyy/System_Rezerwacji_Sal.git
 
-Aby sklonować i uruchomić projekt lokalnie, wykonaj następujące kroki:
+# 2. Przejdź do katalogu projektu
+cd System_Rezerwacji_Sal
 
-1.  **Sklonuj repozytorium:**
-    ```bash
-    git clone https://github.com/m4jorskyy/SystemRezerwacjiSalKonferencyjnych.git
-    ```
-3.  Otwórz projekt w **Android Studio**.
-4.  Poczekaj na zakończenie synchronizacji **Gradle**.
-5.  Uruchom aplikację na wybranym emulatorze lub fizycznym urządzeniu.
+# 3. Otwórz projekt w Android Studio
+# File -> Open -> wybierz folder projektu
 
-## Struktura projektu
+# 4. Poczekaj na synchronizację Gradle
 
-Projekt jest zorganizowany w logiczny sposób, co ułatwia nawigację i rozwój:
+# 5. Skonfiguruj emulator lub podłącz urządzenie
 
-  `/data/api`        - Definicje Retrofit i modele DTO (Data Transfer Objects)
-  
-  `/data/model`      - Modele domenowe aplikacji
-  
-  `/data/local`      - Obsługa lokalnych danych, np. SharedPreferences
+# 6. Uruchom aplikację (Shift + F10 lub przycisk Run)
+```
 
-  `/ui/navigation`   - Nawigacja między ekranami
+## Architektura Projektu
 
-  `/ui/screen`    - Poszczególne ekrany aplikacji (Compose)
-  
-  `/ui/theme`      - Definicje kolorów, typografii i kształtów Material Design
-  
-  `/ui/viewmodel`   - Implementacje ViewModel, logika biznesowa i zarządzanie stanami
+Projekt jest zorganizowany zgodnie z wzorcem MVVM i zasadami Clean Architecture:
 
-## Używane endpointy API
+```
+src/main/java/com/example/systemrezerwacjisal/
+├── data/
+│   ├── api/           # Definicje Retrofit i interfejsy API
+│   ├── model/         # Modele domenowe i DTO
+│   └── local/         # Obsługa lokalnych danych (SharedPreferences)
+└── ui/
+    ├── navigation/    # Nawigacja między ekranami
+    ├── screen/        # Ekrany aplikacji (Composable functions)
+    ├── theme/         # Material Design theming
+    └── viewmodel/     # ViewModels i logika biznesowa
+```
 
-Aplikacja komunikuje się z backendem za pośrednictwem następujących endpointów REST API:
+## API Endpoints
 
-* `POST /api/users/login` - Logowanie użytkownika
-* `GET /api/reservations/user/{id}` - Pobieranie rezerwacji dla danego użytkownika
-* `POST /api/reservations` - Dodawanie nowej rezerwacji
-* `GET /api/rooms/filter` - Filtrowanie dostępnych sal
-* `POST /api/rooms/admin` - Dodawanie nowej sali (tylko dla administratorów)
-* `PUT /api/reservations/{id}` - Edycja istniejącej rezerwacji
-* `DELETE /api/reservations/{id}` - Usuwanie rezerwacji
+Aplikacja komunikuje się z backendem poprzez następujące endpointy REST API:
 
-## Możliwe usprawnienia (TODO)
+### Autoryzacja
+- `POST /api/users/login` - Logowanie użytkownika
+- `POST /api/users/register` - Rejestracja nowego użytkownika
 
-Poniżej lista funkcji, które można rozważyć w przyszłości, aby jeszcze bardziej rozwinąć aplikację:
+### Rezerwacje
+- `GET /api/reservations/user/{id}` - Pobieranie rezerwacji użytkownika
+- `POST /api/reservations` - Dodawanie nowej rezerwacji
+- `PUT /api/reservations/{id}` - Edycja istniejącej rezerwacji
+- `DELETE /api/reservations/{id}` - Usuwanie rezerwacji
 
-* **Notyfikacje** o nadchodzących rezerwacjach.
-* **Obsługa offline** (np. podgląd rezerwacji bez dostępu do internetu).
-* **Integracja z kalendarzem** (Outlook/Google)
-* Implementacja **chatbota AI**, w celu usprawnienia działania.
+### Sale
+- `GET /api/rooms` - Pobieranie listy wszystkich sal
+- `GET /api/rooms/filter` - Filtrowanie dostępnych sal
+- `POST /api/rooms/admin` - Dodawanie nowej sali (admin)
+- `PUT /api/rooms/admin/{id}` - Edycja sali (admin)
+- `DELETE /api/rooms/admin/{id}` - Usuwanie sali (admin)
+
+## Roadmap
+
+Planowane funkcjonalności do implementacji w przyszłych wersjach:
+
+- **Notyfikacje push**: Przypomnienia o nadchodzących rezerwacjach
+- **Tryb offline**: Podgląd rezerwacji bez połączenia internetowego
+- **Integracja z kalendarzem**: Synchronizacja z Google Calendar/Outlook
+- **Chatbot AI**: Inteligentny asystent do zarządzania rezerwacjami
+- **Analityka**: Dashboard z statystykami wykorzystania sal
+- **Lokalizacja**: Wsparcie dla wielu języków
 
 ## Licencja
 
-Projekt jest objęty licencją **MIT**. Więcej informacji znajdziesz w pliku `LICENSE`.
+Projekt jest udostępniany na licencji MIT. Szczegóły w pliku [LICENSE](LICENSE).
 
 ## Autor
 
 **Igor Suchodolski**
-
-* Email: igor.suchodolskii@gmail.com
+- Email: [igor.suchodolskii@gmail.com](mailto:igor.suchodolskii@gmail.com)
+- GitHub: [@m4jorskyy](https://github.com/m4jorskyy)
