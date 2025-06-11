@@ -98,5 +98,4 @@ Projekt jest objęty licencją **MIT**. Więcej informacji znajdziesz w pliku `L
 
 **Igor Suchodolski**
 
-* [GitHub](https://github.com/twoj-login)
 * Email: igor.suchodolskii@gmail.com
