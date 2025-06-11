@@ -1,4 +1,4 @@
-# Aplikacja Rezerwacji Sal
+# System Rezerwacji Sal
 
 Aplikacja mobilna na platformę Android, umożliwiająca użytkownikom **rezerwację sal w budynkach uczelni lub firmy**. 
 
