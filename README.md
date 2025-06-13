@@ -1,6 +1,7 @@
 # System Rezerwacji Sal
 
 Nowoczesna aplikacja mobilna na platformę Android umożliwiająca efektywne zarządzanie rezerwacjami sal w budynkach uczelni, firm czy instytucji. Aplikacja została zaprojektowana z myślą o intuicyjności użytkowania oraz kompletności funkcjonalności.
+Ponadto jest to projekt na pracę inżynierską, więc projekt będzie stale rozwijany.
 
 ## Kluczowe Funkcjonalności
 
