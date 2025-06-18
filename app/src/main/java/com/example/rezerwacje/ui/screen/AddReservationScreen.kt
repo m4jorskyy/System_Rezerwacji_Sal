@@ -202,12 +202,11 @@ fun AddReservation(navController: NavController) {
                                 val userId = authPreferences.userId.first()
                                 if (startDateTime != null && endDateTime != null) {
                                     viewModel.onSubmit(
-                                        roomId = selectedRoomId,
-                                        userId = userId,
-                                        date = startDateTime!!.toLocalDate(),
-                                        startTimeStr = startDateTime!!.toLocalTime().toString(),
-                                        endTimeStr = endDateTime!!.toLocalTime().toString(),
-                                        title = title
+                                        roomId         = selectedRoomId,
+                                        userId         = userId,
+                                        startDateTime  = startDateTime,
+                                        endDateTime    = endDateTime,
+                                        title          = title
                                     )
                                 }
                             }

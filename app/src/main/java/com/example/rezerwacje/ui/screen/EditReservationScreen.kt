@@ -240,12 +240,11 @@ fun EditReservationScreen(navController: NavController, reservationId: Int) {
                                 if (startDateTime != null && endDateTime != null) {
                                     viewModel.onSubmit(
                                         reservationId = reservationId,
-                                        roomId = selectedRoomId,
-                                        userId = userId,
-                                        date = startDateTime!!.toLocalDate(),
-                                        startTimeStr = startDateTime!!.toLocalTime().toString(),
-                                        endTimeStr = endDateTime!!.toLocalTime().toString(),
-                                        title = title
+                                        roomId         = selectedRoomId,
+                                        userId         = userId,
+                                        startDateTime  = startDateTime,
+                                        endDateTime    = endDateTime,
+                                        title          = title
                                     )
                                     savingTriggered = true
                                 }

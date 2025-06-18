@@ -36,7 +36,6 @@ class AddReservationViewModel(private val authPreferences: AuthPreferences) : Vi
         }
     }
 
-
     fun findAvailableRooms(startTime: LocalDateTime, endTime: LocalDateTime) {
         viewModelScope.launch {
             _addReservationState.value = AddReservationState.Loading
@@ -81,58 +80,32 @@ class AddReservationViewModel(private val authPreferences: AuthPreferences) : Vi
     fun onSubmit(
         roomId: Int?,
         userId: Int,
-        date: LocalDate?,
-        startTimeStr: String?,
-        endTimeStr: String?,
+        startDateTime: LocalDateTime?,   // teraz pełne daty
+        endDateTime: LocalDateTime?,
         title: String
     ) {
-        if (date == null) {
-            emitUiMessage("Please select a date!")
+        if (startDateTime == null) {
+            emitUiMessage("Please select start date & time!")
             return
         }
-
-        val startTime = try {
-            startTimeStr?.let { LocalTime.parse(it) }
-        } catch (e: Exception) {
-            null
-        }
-
-        if (startTime == null) {
-            emitUiMessage("Invalid start time!")
+        if (endDateTime == null) {
+            emitUiMessage("Please select end date & time!")
             return
         }
-
-        val endTime = try {
-            endTimeStr?.let { LocalTime.parse(it) }
-        } catch (e: Exception) {
-            null
-        }
-
-        if (endTime == null) {
-            emitUiMessage("Invalid end time!")
+        if (!endDateTime.isAfter(startDateTime)) {
+            emitUiMessage("End must be after start!")
             return
         }
-
-        if (!endTime.isAfter(startTime)) {
-            emitUiMessage("End time must be after start time!")
+        if (startDateTime.isBefore(LocalDateTime.now())) {
+            emitUiMessage("Cannot make reservation in the past!")
             return
         }
-
         if (roomId == null) {
             emitUiMessage("Please select a room!")
             return
         }
-
         if (title.isBlank()) {
             emitUiMessage("Title cannot be empty!")
-            return
-        }
-
-        val startDateTime = date.atTime(startTime)
-        val endDateTime = date.atTime(endTime)
-
-        if (startDateTime.isBefore(LocalDateTime.now())) {
-            emitUiMessage("Cannot make a reservation in the past!")
             return
         }
 
@@ -140,8 +113,8 @@ class AddReservationViewModel(private val authPreferences: AuthPreferences) : Vi
             roomId = roomId,
             userId = userId,
             startTime = startDateTime,
-            endTime = endDateTime,
-            title = title
+            endTime   = endDateTime,
+            title     = title
         )
     }
 

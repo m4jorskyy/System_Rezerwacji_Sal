@@ -59,7 +59,6 @@ class ViewReservationsViewModel(private val authPreferences: AuthPreferences) : 
         }
     }
 
-
     fun resetState() {
         _reservationsState.value = ViewReservationsState.Idle
     }
