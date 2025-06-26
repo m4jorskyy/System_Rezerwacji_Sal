@@ -1,4 +1,4 @@
-package com.example.rezerwacje.data.local.datastore
+package com.example.rezerwacje.data.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -29,11 +29,10 @@ class CalendarDataStore(private val dataStore: DataStore<Preferences>) {
         dataStore.data
             .map { preferences ->
                 val json = preferences[CALENDAR_MAP_KEY] ?: "{}"
-                // Parsowanie JSON → Map<String,Long>
                 val strMap: Map<String, Long> = runCatching {
                     mapAdapter.fromJson(json)
                 }.getOrNull() ?: emptyMap<String, Long>()
-                // Konwersja kluczy → Int
+
                 strMap.entries.fold(mutableMapOf<Int, Long>()) { acc, (key, value) ->
                     key.toIntOrNull()?.let { acc[it] = value }
                     acc
@@ -47,7 +46,6 @@ class CalendarDataStore(private val dataStore: DataStore<Preferences>) {
                 mapAdapter.fromJson(currentJson)
             }.getOrNull()?.toMutableMap() ?: mutableMapOf()
 
-            // Dodajemy wpis (Int→String)
             strMap[reservationId.toString()] = eventId
             preferences[CALENDAR_MAP_KEY] = mapAdapter.toJson(strMap)
         }
