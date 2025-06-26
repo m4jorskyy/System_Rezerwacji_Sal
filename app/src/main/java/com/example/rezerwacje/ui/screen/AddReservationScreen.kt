@@ -202,11 +202,11 @@ fun AddReservation(navController: NavController) {
                                 val userId = authPreferences.userId.first()
                                 if (startDateTime != null && endDateTime != null) {
                                     viewModel.onSubmit(
-                                        roomId         = selectedRoomId,
-                                        userId         = userId,
-                                        startDateTime  = startDateTime,
-                                        endDateTime    = endDateTime,
-                                        title          = title
+                                        roomId = selectedRoomId,
+                                        userId = userId,
+                                        startDateTime = startDateTime,
+                                        endDateTime = endDateTime,
+                                        title = title
                                     )
                                 }
                             }
@@ -222,7 +222,6 @@ fun AddReservation(navController: NavController) {
                             fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
                         )
                     }
-
 
                 }
 
