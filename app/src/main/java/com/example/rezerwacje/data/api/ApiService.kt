@@ -9,7 +9,7 @@ import com.example.rezerwacje.data.model.LoginResponse
 import com.example.rezerwacje.data.model.RegisterRequest
 import com.example.rezerwacje.data.model.RegisterResponse
 import com.example.rezerwacje.data.model.Reservation
-import com.example.rezerwacje.data.model.Room
+import com.example.rezerwacje.data.model.RoomDataModel
 import com.example.rezerwacje.data.model.RoomFilterRequest
 
 
@@ -49,7 +49,7 @@ interface ApiService {
     suspend fun filterRooms(
         @Body request: RoomFilterRequest,
         @Header("Authorization") token: String
-    ): List<Room>
+    ): List<RoomDataModel>
 
     @Headers("Content-Type: application/json")
     @DELETE("api/rooms/admin/{roomId}")
@@ -70,7 +70,7 @@ interface ApiService {
     suspend fun getRoomById(
         @Path("id") roomId: Int,
         @Header("Authorization") token: String
-    ): Room
+    ): RoomDataModel
 
     @Headers("Content-Type: application/json")
     @POST("api/reservations")

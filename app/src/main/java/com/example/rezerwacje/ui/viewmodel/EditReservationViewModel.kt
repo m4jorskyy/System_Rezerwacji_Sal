@@ -11,13 +11,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import com.example.rezerwacje.data.model.Reservation
-import com.example.rezerwacje.data.model.Room
+import com.example.rezerwacje.data.model.RoomDataModel
 import com.example.rezerwacje.data.model.RoomFilterRequest
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 class EditReservationViewModel(private val authPreferences: AuthPreferences) : ViewModel() {
     private val _reservation = MutableStateFlow<Reservation?>(null)
@@ -26,8 +24,8 @@ class EditReservationViewModel(private val authPreferences: AuthPreferences) : V
     private val _editReservationState = MutableStateFlow<EditReservationState>(EditReservationState.Idle)
     val editReservationState: StateFlow<EditReservationState> = _editReservationState
 
-    private val _rooms = MutableStateFlow<List<Room>>(emptyList())
-    val rooms: StateFlow<List<Room>> = _rooms
+    private val _rooms = MutableStateFlow<List<RoomDataModel>>(emptyList())
+    val rooms: StateFlow<List<RoomDataModel>> = _rooms
 
     private val _uiMessage = MutableSharedFlow<String>()
     val uiMessage = _uiMessage.asSharedFlow()

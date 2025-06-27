@@ -1,6 +1,6 @@
 package com.example.rezerwacje.data.model
 
-data class Room(
+data class RoomDataModel(
     val id: Int,
     val name: String,
     val building: String,

@@ -6,26 +6,23 @@ import androidx.lifecycle.viewModelScope
 import com.example.rezerwacje.data.api.RetrofitInstance
 import com.example.rezerwacje.data.local.AuthPreferences
 import com.example.rezerwacje.data.model.AddReservationRequest
-import com.example.rezerwacje.data.model.Room
+import com.example.rezerwacje.data.model.RoomDataModel
 import com.example.rezerwacje.data.model.RoomFilterRequest
-import com.example.rezerwacje.ui.screen.AddReservation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 class AddReservationViewModel(private val authPreferences: AuthPreferences) : ViewModel() {
     private val _addReservationState =
         MutableStateFlow<AddReservationState>(AddReservationState.Idle)
     val addReservationState: StateFlow<AddReservationState> = _addReservationState
 
-    private val _rooms = MutableStateFlow<List<Room>>(emptyList())
-    val rooms: StateFlow<List<Room>> = _rooms
+    private val _rooms = MutableStateFlow<List<RoomDataModel>>(emptyList())
+    val rooms: StateFlow<List<RoomDataModel>> = _rooms
 
     private val _uiMessage = MutableSharedFlow<String>()
     val uiMessage = _uiMessage.asSharedFlow()

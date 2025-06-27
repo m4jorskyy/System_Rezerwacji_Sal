@@ -38,11 +38,11 @@ class AuthPreferences(private val context: Context) {
         context.dataStore.edit { it[userIdKey] = userId }
     }
 
-    suspend fun saveUserRole(userRole: String){
+    suspend fun saveUserRole(userRole: String) {
         context.dataStore.edit { it[userRoleKey] = userRole }
     }
 
-    suspend fun saveUserName(userName: String){
+    suspend fun saveUserName(userName: String) {
         context.dataStore.edit { it[userNameKey] = userName }
     }
 

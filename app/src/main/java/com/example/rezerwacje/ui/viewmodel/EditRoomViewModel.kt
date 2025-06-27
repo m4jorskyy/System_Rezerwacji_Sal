@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.rezerwacje.data.api.RetrofitInstance
 import com.example.rezerwacje.data.local.AuthPreferences
 import com.example.rezerwacje.data.model.AddRoomRequest
-import com.example.rezerwacje.data.model.Room
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
