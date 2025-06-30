@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rezerwacje.R
+import com.example.rezerwacje.data.database.ReservationsRepository
 import com.example.rezerwacje.ui.navigation.Screen
 import com.example.rezerwacje.ui.theme.RezerwacjeTheme
 import com.example.rezerwacje.ui.viewmodel.AddReservationState
@@ -24,6 +25,7 @@ import com.example.rezerwacje.ui.viewmodel.AddReservationViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDateTime
 import com.example.rezerwacje.data.local.AuthPreferences
+import com.example.rezerwacje.notification.NotificationScheduler
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -31,9 +33,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AddReservation(navController: NavController) {
     val context = LocalContext.current
+    val repo = ReservationsRepository()
+    val scheduler = NotificationScheduler(context)
     val authPreferences = remember { AuthPreferences(context) }
     val viewModel: AddReservationViewModel = viewModel(
-        factory = AddReservationViewModelFactory(context)
+        factory = AddReservationViewModelFactory(context, repo, scheduler)
     )
     val snackbarHostState = remember { SnackbarHostState() }
 

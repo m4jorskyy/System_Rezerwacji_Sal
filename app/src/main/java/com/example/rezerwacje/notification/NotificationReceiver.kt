@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.rezerwacje.MainActivity
 
@@ -17,21 +18,27 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+
+        val action = intent.action
+        if (action != null && action != Intent.ACTION_BOOT_COMPLETED) {
+            Log.d("Receiver", "Received unknown or no action: $action")
+            return
+        }
+
+        Log.d("Receiver", "onReceive id=${intent.getIntExtra("id", -1)}")
         val title = intent.getStringExtra("title") ?: "Rezerwacja"
         val text  = intent.getStringExtra("text")  ?: ""
         val id    = intent.getIntExtra("id", 0)
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Powiadomienia o nadchodzących rezerwacjach"
-            }
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Powiadomienia o nadchodzących rezerwacjach"
         }
+        notificationManager.createNotificationChannel(channel)
 
         val tapIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -52,6 +59,9 @@ class NotificationReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
+
+
+        Log.d("Receiver", "dispatching notification for id=$id")
 
         notificationManager.notify(id, notification)
     }
