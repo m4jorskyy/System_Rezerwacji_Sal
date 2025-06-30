@@ -8,32 +8,24 @@ import com.example.rezerwacje.data.database.ReservationsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.ZoneId
 
 class NotificationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            val dao = ReservationsApp.database.reservationsDao()
-            val repo = ReservationsRepository()
-            val scheduler = NotificationScheduler(context)
+        if(intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
-            CoroutineScope(Dispatchers.IO).launch {
-                val now = System.currentTimeMillis()
-                val reservations = repo.getUpcomingReservations(now)
-                reservations.forEach { item ->
-                    val triggerAt = item.startTime
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli() - 10 * 60 * 1000L
+        val repo = ReservationsRepository(NotificationScheduler(context))
+        val dao = ReservationsApp.database.reservationsDao()
 
-                    if (triggerAt > now) {
-                        scheduler.scheduleNotification(
-                            id = item.id,
-                            triggerAt = triggerAt,
-                            title = "Przypomnienie: ${item.name}",
-                            text = "Zdarzenie zaraz się zacznie"
-                        )
+        CoroutineScope(Dispatchers.IO).launch {
+            val now = System.currentTimeMillis()
+            val all = dao.getUpcomingReservations(now)
+
+            all.forEach { r ->
+                when (r.alarmState) {
+                    AlarmState.PENDING, AlarmState.SCHEDULED -> {
+                        repo.scheduleForReservation(r.id)
                     }
+                    AlarmState.CANCELED -> {}
                 }
             }
         }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface ReservationsDao {
@@ -21,5 +22,8 @@ interface ReservationsDao {
 
     @Query("DELETE FROM reservations WHERE id = :id")
     suspend fun deleteReservation(id: Int)
+
+    @Update
+    suspend fun updateReservation(reservation: ReservationEntity)
 
 }

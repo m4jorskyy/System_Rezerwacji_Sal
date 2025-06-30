@@ -3,6 +3,7 @@ package com.example.rezerwacje.data.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.example.rezerwacje.notification.AlarmState
 import java.time.LocalDateTime
 
 @Entity(tableName = "reservations")
@@ -12,5 +13,7 @@ data class ReservationEntity(
     val id: Int,
     val name: String,
     val startTime: LocalDateTime,
-    val endTime: LocalDateTime
+    val endTime: LocalDateTime,
+    val nextTriggerAt: Long? = null,
+    val alarmState: AlarmState = AlarmState.PENDING
 )

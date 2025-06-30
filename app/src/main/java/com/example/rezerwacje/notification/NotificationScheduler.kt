@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.core.app.AlarmManagerCompat
 import java.util.Date
 import kotlin.jvm.java
+import androidx.core.net.toUri
 
 class NotificationScheduler(private val context: Context) {
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -51,7 +52,21 @@ class NotificationScheduler(private val context: Context) {
         )
     }
 
-    fun cancel(id: Int) {
+    fun isAlarmActive(id: Int): Boolean {
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            data = "reservation://$id".toUri()
+        }
+        val pi = PendingIntent.getBroadcast(
+            context,
+            id,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        return pi != null
+    }
+
+
+    fun cancelNotification(id: Int) {
         val notificationIntent = Intent(context, NotificationReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
