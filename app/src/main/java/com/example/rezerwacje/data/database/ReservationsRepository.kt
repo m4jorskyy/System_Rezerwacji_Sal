@@ -12,6 +12,15 @@ class ReservationsRepository(
     private val dao = ReservationsApp.database.reservationsDao()
 
 
+    private fun autoNextTriggerAt(startTime: LocalDateTime): Long {
+
+        return startTime.atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli() - 10 * 60 * 1000L
+    }
+
+    suspend fun updateReservation(reservation: ReservationEntity) = dao.updateReservation(reservation)
+
     suspend fun getAllReservations(): List<ReservationEntity> = dao.getAllReservations()
 
     suspend fun insertReservation(reservation: ReservationEntity) =
@@ -23,13 +32,6 @@ class ReservationsRepository(
 
     suspend fun getUpcomingReservations(nowEpoch: Long): List<ReservationEntity> =
         dao.getUpcomingReservations(nowEpoch)
-
-    private fun autoNextTriggerAt(startTime: LocalDateTime): Long {
-
-        return startTime.atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli() - 10 * 60 * 1000L
-    }
 
     suspend fun scheduleForReservation(id: Int) {
         val reservation = getReservationById(id) ?: return
@@ -45,6 +47,10 @@ class ReservationsRepository(
             alarmState = AlarmState.SCHEDULED
         )
         dao.updateReservation(updated)
+    }
+
+    fun cancelAlarm(id: Int) {
+        scheduler.cancelNotification(id)
     }
 
 }

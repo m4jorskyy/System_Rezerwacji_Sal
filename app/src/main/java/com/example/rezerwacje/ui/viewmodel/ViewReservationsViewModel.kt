@@ -3,8 +3,8 @@ package com.example.rezerwacje.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rezerwacje.data.api.RetrofitInstance
+import com.example.rezerwacje.data.database.ReservationsRepository
 import com.example.rezerwacje.data.local.AuthPreferences
-import com.example.rezerwacje.data.model.Reservation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,9 +12,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import java.time.LocalDateTime
 
-class ViewReservationsViewModel(private val authPreferences: AuthPreferences) : ViewModel() {
+class ViewReservationsViewModel(
+    private val authPreferences: AuthPreferences,
+    private val localRepo: ReservationsRepository
+) : ViewModel() {
     private val _reservationsState =
         MutableStateFlow<ViewReservationsState>(ViewReservationsState.Idle)
     val reservationsState: StateFlow<ViewReservationsState> = _reservationsState
@@ -48,13 +50,20 @@ class ViewReservationsViewModel(private val authPreferences: AuthPreferences) : 
 
     fun deleteReservation(reservationId: Int) {
         viewModelScope.launch {
-            val token = authPreferences.token.first()
-            val response = RetrofitInstance.api.deleteReservation(reservationId, "Bearer $token")
-
-            if (response.isSuccessful) {
-                getUserReservations()
-            } else {
-                _reservationsState.value = ViewReservationsState.Error("HTTP: ${response.code()} \n ${response.message()}")
+            try {
+                val token = authPreferences.token.first()
+                val response = RetrofitInstance.api.deleteReservation(reservationId, "Bearer $token")
+                if (response.isSuccessful) {
+                    localRepo.cancelAlarm(reservationId)
+                    localRepo.deleteReservation(reservationId)
+                    getUserReservations()
+                }
+            } catch (e: HttpException) {
+                _reservationsState.value = ViewReservationsState.Error("HTTP: ${e.code()}")
+                return@launch
+            } catch (e: Exception) {
+                _reservationsState.value = ViewReservationsState.Error(e.message ?: "Unknown error")
+                return@launch
             }
         }
     }

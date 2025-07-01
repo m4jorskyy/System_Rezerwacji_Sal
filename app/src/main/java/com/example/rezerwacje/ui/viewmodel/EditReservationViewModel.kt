@@ -3,6 +3,7 @@ package com.example.rezerwacje.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rezerwacje.data.api.RetrofitInstance
+import com.example.rezerwacje.data.database.ReservationsRepository
 import com.example.rezerwacje.data.local.AuthPreferences
 import com.example.rezerwacje.data.model.AddReservationRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,15 +14,21 @@ import retrofit2.HttpException
 import com.example.rezerwacje.data.model.Reservation
 import com.example.rezerwacje.data.model.RoomDataModel
 import com.example.rezerwacje.data.model.RoomFilterRequest
+import com.example.rezerwacje.data.model.toEntity
+import com.example.rezerwacje.notification.AlarmState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.time.LocalDateTime
 
-class EditReservationViewModel(private val authPreferences: AuthPreferences) : ViewModel() {
+class EditReservationViewModel(
+    private val authPreferences: AuthPreferences,
+    private val localRepo: ReservationsRepository
+) : ViewModel() {
     private val _reservation = MutableStateFlow<Reservation?>(null)
     val reservation: StateFlow<Reservation?> = _reservation
 
-    private val _editReservationState = MutableStateFlow<EditReservationState>(EditReservationState.Idle)
+    private val _editReservationState =
+        MutableStateFlow<EditReservationState>(EditReservationState.Idle)
     val editReservationState: StateFlow<EditReservationState> = _editReservationState
 
     private val _rooms = MutableStateFlow<List<RoomDataModel>>(emptyList())
@@ -39,15 +46,35 @@ class EditReservationViewModel(private val authPreferences: AuthPreferences) : V
     fun editReservation(reservationId: Int, request: AddReservationRequest) {
         viewModelScope.launch {
             _editReservationState.value = EditReservationState.Loading
-            try {
+            val response = try {
                 val token = authPreferences.token.first()
-                RetrofitInstance.api.editReservation(reservationId, request, "Bearer $token")
-                _editReservationState.value = EditReservationState.Success
+                RetrofitInstance.api.editReservation(
+                    reservationId = reservationId,
+                    request = request,
+                    token = "Bearer $token"
+                )
             } catch (e: HttpException) {
-                _editReservationState.value = EditReservationState.Error("HTTP ${e.code()}")
+                _editReservationState.value = EditReservationState.Error("HTTP: ${e.code()}")
+                return@launch
             } catch (e: Exception) {
-                _editReservationState.value = EditReservationState.Error(e.message ?: "Unknown error")
+                _editReservationState.value =
+                    EditReservationState.Error(e.message ?: "Unknown error")
+                return@launch
             }
+
+            val entity = response.toEntity()
+
+            try {
+                localRepo.cancelAlarm(entity.id)
+                localRepo.updateReservation(entity)
+                localRepo.scheduleForReservation(entity.id)
+            } catch (e: Exception) {
+                localRepo.updateReservation(entity.copy(alarmState = AlarmState.PENDING))
+                _editReservationState.value = EditReservationState.AlarmFailed(e.message ?: "")
+                return@launch
+            }
+
+            _editReservationState.value = EditReservationState.Success
         }
     }
 
@@ -63,7 +90,8 @@ class EditReservationViewModel(private val authPreferences: AuthPreferences) : V
                 val reservation = reservations.find { it.id == reservationId }
                 if (reservation == null) {
                     emitUiMessage("Reservation not found")
-                    _editReservationState.value = EditReservationState.Error("Reservation not found")
+                    _editReservationState.value =
+                        EditReservationState.Error("Reservation not found")
                     return@launch
                 }
                 _reservation.value = reservation
@@ -93,7 +121,8 @@ class EditReservationViewModel(private val authPreferences: AuthPreferences) : V
             } catch (e: HttpException) {
                 _editReservationState.value = EditReservationState.Error("HTTP: ${e.code()}")
             } catch (e: Exception) {
-                _editReservationState.value = EditReservationState.Error(e.message ?: "Unknown error")
+                _editReservationState.value =
+                    EditReservationState.Error(e.message ?: "Unknown error")
             }
         }
     }

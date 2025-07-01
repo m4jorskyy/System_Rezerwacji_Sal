@@ -6,31 +6,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
-import androidx.navigation.compose.rememberNavController
-import com.example.rezerwacje.ui.navigation.AppNavigation
-import com.example.rezerwacje.ui.theme.RezerwacjeTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.navigation.compose.rememberNavController
 import com.example.rezerwacje.data.database.ReservationsRepository
 import com.example.rezerwacje.notification.NotificationScheduler
-import kotlinx.coroutines.delay
 import com.example.rezerwacje.notification.NotificationViewModel
 import com.example.rezerwacje.notification.NotificationViewModelFactory
+import com.example.rezerwacje.ui.navigation.AppNavigation
+import com.example.rezerwacje.ui.theme.RezerwacjeTheme
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
-    private val notificationViewModel: NotificationViewModel by viewModels {
-        NotificationViewModelFactory(
-            ReservationsRepository(),
-            NotificationScheduler(this)
-        )
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val repo = ReservationsRepository(NotificationScheduler(this))
+        val factory = NotificationViewModelFactory(repo, NotificationScheduler(this))
+        val vm: NotificationViewModel by viewModels { factory }
+
+
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val reconciled = prefs.getBoolean("alarms_reconciled", false)
+        val scheduled = prefs.getBoolean("alarms_scheduled", false)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
@@ -59,6 +64,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        notificationViewModel.scheduleAll()
+        if (!reconciled) {
+            vm.reconcileAlarms()
+            prefs.edit { putBoolean("alarms_reconciled", true) }
+        }
+        if (!scheduled) {
+            vm.scheduleAll()
+            prefs.edit { putBoolean("alarms_scheduled", true) }
+        }
     }
 }

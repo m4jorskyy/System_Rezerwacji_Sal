@@ -6,4 +6,5 @@ sealed class EditReservationState {
     object Success : EditReservationState()
     object RoomsLoaded : EditReservationState()
     data class Error(val message: String) : EditReservationState()
+    data class AlarmFailed(val msg: String): EditReservationState()
 }

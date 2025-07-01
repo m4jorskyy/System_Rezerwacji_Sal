@@ -1,12 +1,8 @@
 package com.example.rezerwacje.ui.screen
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +19,11 @@ import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.rememberDismissState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -60,11 +56,8 @@ import com.example.rezerwacje.ui.navigation.Screen
 import com.example.rezerwacje.ui.viewmodel.ViewReservationsState
 import com.example.rezerwacje.ui.viewmodel.ViewReservationsViewModel
 import com.example.rezerwacje.ui.viewmodel.ViewReservationsViewModelFactory
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -260,17 +253,18 @@ fun ReservationItem(reservation: Reservation, modifier: Modifier = Modifier) {
     val backgroundColor = MaterialTheme.colorScheme.background
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()             // najpierw padding/spacing
+            .padding(8.dp),             // albo przenieś padding tu
         tonalElevation = 2.dp,
         color = backgroundColor,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
     ) {
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
-                .padding(12.dp),
+                .padding(12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

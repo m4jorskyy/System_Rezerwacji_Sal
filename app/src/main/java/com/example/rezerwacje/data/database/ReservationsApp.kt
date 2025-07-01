@@ -2,6 +2,7 @@ package com.example.rezerwacje.data.database
 
 import android.app.Application
 import androidx.room.Room
+import kotlin.jvm.java
 
 class ReservationsApp : Application() {
 
@@ -15,7 +16,10 @@ class ReservationsApp : Application() {
         database = Room.databaseBuilder(
             applicationContext,
             ReservationsDatabase::class.java,
-            "reservations_database"
-        ).fallbackToDestructiveMigration().build()
+            "reservations-db"
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
+
     }
 }

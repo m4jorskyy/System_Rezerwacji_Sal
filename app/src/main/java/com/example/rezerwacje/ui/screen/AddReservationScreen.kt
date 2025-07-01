@@ -33,11 +33,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AddReservation(navController: NavController) {
     val context = LocalContext.current
-    val repo = ReservationsRepository()
     val scheduler = NotificationScheduler(context)
+    val repo = ReservationsRepository(scheduler)
     val authPreferences = remember { AuthPreferences(context) }
     val viewModel: AddReservationViewModel = viewModel(
-        factory = AddReservationViewModelFactory(context, repo, scheduler)
+        factory = AddReservationViewModelFactory(context, repo)
     )
     val snackbarHostState = remember { SnackbarHostState() }
 
