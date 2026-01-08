@@ -5,5 +5,5 @@ sealed class AddReservationState {
     object Loading : AddReservationState()
     object RoomsLoaded : AddReservationState()
     object ReservationSuccess : AddReservationState()
-    data class Error(val msg: String): AddReservationState()
+    data class Error(val message: String): AddReservationState()
 }

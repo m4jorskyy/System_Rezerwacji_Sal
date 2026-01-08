@@ -1,6 +1,5 @@
 package com.example.rezerwacje.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rezerwacje.R
+import com.example.rezerwacje.ui.components.ReservationCard // <--- Nowy import
 import com.example.rezerwacje.ui.navigation.Screen
 import com.example.rezerwacje.ui.theme.RezerwacjeTheme
 import com.example.rezerwacje.ui.viewmodel.ViewReservationsState
@@ -82,7 +82,9 @@ fun ReservationHistoryScreen(navController: NavController) {
                 when (val state = reservationsState) {
                     is ViewReservationsState.Success -> {
                         val now = LocalDateTime.now()
+                        // Filtrujemy tylko przeszłe
                         val past = state.reservations.filter { it.endTime.isBefore(now) }
+
                         if (past.isEmpty()) {
                             item {
                                 Text(
@@ -92,9 +94,15 @@ fun ReservationHistoryScreen(navController: NavController) {
                                 )
                             }
                         } else {
-                            items(
-                                items = past, key = { it.id }) { reservation ->
-                                ReservationItem(reservation, modifier = Modifier.padding(16.dp))
+                            items(items = past, key = { it.id }) { reservation ->
+                                // Używamy Boxa do marginesów bocznych (16dp lub 32dp w zależności od gustu)
+                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    ReservationCard(
+                                        reservation = reservation
+                                        // Nie przekazujemy onEdit/onDelete, bo to historia
+                                        // Karta wyświetli się bez menu opcji
+                                    )
+                                }
                             }
                         }
                     }
@@ -102,9 +110,7 @@ fun ReservationHistoryScreen(navController: NavController) {
                     is ViewReservationsState.Loading -> {
                         item {
                             CircularProgressIndicator(
-                                modifier = Modifier.align(
-                                    Alignment.Center
-                                ),
+                                modifier = Modifier.align(Alignment.Center),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }

@@ -134,6 +134,20 @@ fun ReservationScreen(navController: NavController) {
                         )
                     }
                 }
+                item { Spacer(modifier = Modifier.height(8.dp))}
+                item {
+                    Button(
+                        onClick = { navController.navigate(Screen.SHOW_STATS.route) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 32.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.show_stats),
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
+                        )
+                    }
+                }
             }
         }
 

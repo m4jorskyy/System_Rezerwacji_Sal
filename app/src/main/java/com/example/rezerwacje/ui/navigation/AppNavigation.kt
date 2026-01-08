@@ -14,6 +14,8 @@ import com.example.rezerwacje.ui.screen.RegisterScreen
 import com.example.rezerwacje.ui.screen.ReservationHistoryScreen
 import com.example.rezerwacje.ui.screen.ReservationScreen
 import com.example.rezerwacje.ui.screen.ShowRoomsScreen
+import com.example.rezerwacje.ui.screen.StatsDetailsScreen
+import com.example.rezerwacje.ui.screen.StatsScreen
 import com.example.rezerwacje.ui.screen.ViewReservationsScreen
 
 @Composable
@@ -57,6 +59,16 @@ fun AppNavigation(navController: NavHostController) {
             reservationId?.let {
                 EditReservationScreen(navController, it)
             }
+        }
+        composable(Screen.SHOW_STATS.route){
+            StatsScreen(navController)
+        }
+        composable("${Screen.STATS_DETAILS.route}/{type}/{id}") { backStackEntry ->
+            // Wyciągamy parametry z URL (podobnie jak w EditRoom)
+            val type = backStackEntry.arguments?.getString("type") ?: "room"
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+
+            StatsDetailsScreen(navController, type, id)
         }
     }
 }

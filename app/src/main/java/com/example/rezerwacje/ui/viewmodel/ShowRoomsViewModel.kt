@@ -47,16 +47,29 @@ class ShowRoomsViewModel(private val authPreferences: AuthPreferences) : ViewMod
     fun deleteRoom(roomId: Int) {
         viewModelScope.launch {
             _roomsState.value = ShowRoomsState.Loading
+
             try {
                 val token = authPreferences.token.first()
                 val response = RetrofitInstance.api.deleteRoom(roomId, "Bearer $token")
+
                 if (response.isSuccessful){
+                    emitUiMessage("Pokój usunięty pomyślnie")
                     showRooms()
+                } else {
+                    // --- TUTAJ DODAJEMY OBSŁUGĘ BŁĘDU 409 ---
+                    if (response.code() == 409) {
+                        emitUiMessage("Nie można usunąć sali, która ma przypisane rezerwacje!")
+                    } else {
+                        emitUiMessage("Nie udało się usunąć: kod ${response.code()}")
+                    }
+                    showRooms() // Zdejmujemy loader
                 }
             } catch (e: HttpException) {
-                _roomsState.value = ShowRoomsState.Error("HTTP: ${e.code()}")
+                emitUiMessage("Błąd sieci: ${e.code()}")
+                showRooms()
             } catch (e: Exception) {
-                _roomsState.value = ShowRoomsState.Error(e.message ?: "Unknown error")
+                emitUiMessage("Błąd: ${e.message}")
+                showRooms()
             }
         }
     }

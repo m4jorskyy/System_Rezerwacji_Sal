@@ -6,8 +6,9 @@ import java.time.LocalDateTime
 fun AddReservationResponse.toEntity(): ReservationEntity {
     return ReservationEntity(
         id        = this.id,
-        name      = this.title,
+        title      = this.title,
         startTime = LocalDateTime.parse(this.startTime.toString()),
-        endTime   = LocalDateTime.parse(this.endTime.toString())
+        endTime   = LocalDateTime.parse(this.endTime.toString()),
+        roomId = this.roomId
     )
 }

@@ -37,7 +37,7 @@ class NotificationViewModel(
                         scheduler.scheduleNotification(
                             id = r.id,
                             triggerAt = nextTrigger,
-                            title = "Przypomnienie: ${r.name}",
+                            title = "Przypomnienie: ${r.title}",
                             text = "Zdarzenie zaraz się zacznie"
                         )
 
@@ -50,7 +50,7 @@ class NotificationViewModel(
                         scheduler.scheduleNotification(
                             id = r.id,
                             triggerAt = r.nextTriggerAt!!,
-                            title = "Przypomnienie: ${r.name}",
+                            title = "Przypomnienie: ${r.title}",
                             text = "Zdarzenie zaraz się zacznie"
                         )
                         repo.scheduleForReservation(r.id)

@@ -11,5 +11,7 @@ enum class Screen(val route: String) {
     ADD_ROOM("add_room"),
     SHOW_ROOMS("show_rooms"),
     EDIT_ROOM("edit_room"),
-    EDIT_RESERVATION("edit_reservation")
+    EDIT_RESERVATION("edit_reservation"),
+    SHOW_STATS("show_stats"),
+    STATS_DETAILS("stats_details")
 }

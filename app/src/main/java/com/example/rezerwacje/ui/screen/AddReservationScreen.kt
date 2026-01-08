@@ -3,13 +3,14 @@ package com.example.rezerwacje.ui.screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,15 +18,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rezerwacje.R
 import com.example.rezerwacje.data.database.ReservationsRepository
+import com.example.rezerwacje.data.local.AuthPreferences
+import com.example.rezerwacje.notification.NotificationScheduler
+import com.example.rezerwacje.ui.components.RoomCard // <--- WAŻNY IMPORT
 import com.example.rezerwacje.ui.navigation.Screen
 import com.example.rezerwacje.ui.theme.RezerwacjeTheme
+import com.example.rezerwacje.ui.util.showDateTimePicker
 import com.example.rezerwacje.ui.viewmodel.AddReservationState
 import com.example.rezerwacje.ui.viewmodel.AddReservationViewModel
 import com.example.rezerwacje.ui.viewmodel.AddReservationViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDateTime
-import com.example.rezerwacje.data.local.AuthPreferences
-import com.example.rezerwacje.notification.NotificationScheduler
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -44,14 +46,23 @@ fun AddReservation(navController: NavController) {
     val addReservationState by viewModel.addReservationState.collectAsState()
     val availableRooms by viewModel.rooms.collectAsState()
 
-    var startDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
-    var endDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
+    val startDateTime by viewModel.startDateTime.collectAsState()
+    val endDateTime by viewModel.endDateTime.collectAsState()
+
+    val capacity by viewModel.capacity.collectAsState()
+    val hasWhiteboard by viewModel.hasWhiteboard.collectAsState()
+    val hasProjector by viewModel.hasProjector.collectAsState()
+    val hasDesks by viewModel.hasDesks.collectAsState()
+
+    // --- LOKALNE STANY UI ---
     var selectedRoomId by remember { mutableStateOf<Int?>(null) }
     var title by remember { mutableStateOf("") }
+
     val coroutineScope = rememberCoroutineScope()
     val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
 
 
+    // Obsługa komunikatów (Toast/Snackbar)
     LaunchedEffect(Unit) {
         viewModel.uiMessage.collectLatest { msg ->
             snackbarHostState.showSnackbar(msg)
@@ -61,19 +72,16 @@ fun AddReservation(navController: NavController) {
     LaunchedEffect(addReservationState) {
         when (val state = addReservationState) {
             is AddReservationState.Error -> {
-                viewModel.emitUiMessage(state.msg)
+                viewModel.emitUiMessage(state.message) // Pamiętaj o .message zamiast .msg jeśli zmieniłeś w VM
                 viewModel.resetState()
             }
-
             is AddReservationState.ReservationSuccess -> {
                 viewModel.emitUiMessage(context.getString(R.string.reservation_added))
                 viewModel.resetState()
                 navController.navigate(Screen.VIEW.route)
             }
-
             else -> {}
         }
-
     }
 
     Scaffold(
@@ -91,12 +99,13 @@ fun AddReservation(navController: NavController) {
                     .padding(bottom = 72.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // --- SEKCJA DAT ---
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {
                             showDateTimePicker(context) { selected ->
-                                startDateTime = selected
+                                viewModel.onStartTimeChange(selected)
                             }
                         },
                         shape = MaterialTheme.shapes.medium,
@@ -118,7 +127,7 @@ fun AddReservation(navController: NavController) {
                         onClick = {
                             showDateTimePicker(context) { selected ->
                                 if (startDateTime != null && selected.isBefore(startDateTime)) return@showDateTimePicker
-                                endDateTime = selected
+                                viewModel.onEndTimeChange(selected)
                             }
                         },
                         shape = MaterialTheme.shapes.medium,
@@ -134,54 +143,94 @@ fun AddReservation(navController: NavController) {
                     }
                 }
 
+                // --- FILTRY ---
                 item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            if (startDateTime != null && endDateTime != null) {
-                                selectedRoomId = null
-                                viewModel.findAvailableRooms(startDateTime!!, endDateTime!!)
-                            }
-                        },
-                        enabled = startDateTime != null && endDateTime != null,
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = capacity,
+                        onValueChange = { viewModel.onCapacityChange(it) },
+                        label = { Text("Minimum Capacity") },
+                        placeholder = { Text("e.g. 5") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 32.dp),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text(
-                            stringResource(R.string.find_rooms_text),
-                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp)
+                    )
                 }
 
-                if (addReservationState is AddReservationState.RoomsLoaded) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp)
+                    ) {
+                        Text("Required Equipment:", style = MaterialTheme.typography.bodyMedium)
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = hasWhiteboard,
+                                onCheckedChange = { viewModel.onWhiteboardChange(it) }
+                            )
+                            Text("Whiteboard")
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = hasProjector,
+                                onCheckedChange = { viewModel.onProjectorChange(it) }
+                            )
+                            Text("Projector")
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = hasDesks,
+                                onCheckedChange = { viewModel.onDesksChange(it) }
+                            )
+                            Text("Desks")
+                        }
+                    }
+                }
+
+                // --- LOADING ---
+                item {
+                    if (addReservationState is AddReservationState.Loading) {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    }
+                }
+
+                // --- LISTA DOSTĘPNYCH SAL (Z UŻYCIEM ROOMCARD) ---
+                if (availableRooms.isNotEmpty() || addReservationState is AddReservationState.RoomsLoaded) {
                     items(availableRooms) { room ->
-                        Button(onClick = {
-                            selectedRoomId = room.id
-                        }) {
-                            Text(
-                                "${room.name} (${room.building})",
-                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
+                        // Używamy Boxa, aby nadać marginesy boczne (32.dp) identyczne jak reszta elementów
+                        Box(modifier = Modifier.padding(horizontal = 32.dp)) {
+                            RoomCard(
+                                room = room,
+                                isSelected = selectedRoomId == room.id,
+                                onClick = { selectedRoomId = room.id }
+                                // onEdit i onDelete pomijamy, bo tutaj tylko wybieramy
                             )
                         }
                     }
                 }
 
+                // --- PODSUMOWANIE WYBORU ---
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    var selectedRoom = availableRooms.firstOrNull { it.id == selectedRoomId }
+                    val selectedRoom = availableRooms.firstOrNull { it.id == selectedRoomId }
                     selectedRoom?.let {
                         Text(
-                            text = "Chose: ${it.name} (${it.building})",
-                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
+                            text = "Chosen: ${it.name} (${it.building})",
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                            modifier = Modifier.padding(horizontal = 32.dp)
                         )
                     }
                 }
 
+                // --- TYTUŁ REZERWACJI ---
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -193,28 +242,30 @@ fun AddReservation(navController: NavController) {
                                 stringResource(R.string.reservation_title_text),
                                 fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
                             )
-                        }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp)
                     )
                 }
 
+                // --- PRZYCISK DODANIA ---
                 item {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
                         onClick = {
                             coroutineScope.launch {
                                 val userId = authPreferences.userId.first()
-                                if (startDateTime != null && endDateTime != null) {
-                                    viewModel.onSubmit(
-                                        roomId = selectedRoomId,
-                                        userId = userId,
-                                        startDateTime = startDateTime,
-                                        endDateTime = endDateTime,
-                                        title = title
-                                    )
-                                }
+                                // Używamy nowej metody onSubmit (bez przekazywania dat, VM je zna)
+                                viewModel.onSubmit(
+                                    roomId = selectedRoomId,
+                                    userId = userId,
+                                    title = title
+                                )
                             }
                         },
+                        // Blokujemy przycisk, jeśli ładuje lub brak wybranej sali/tytułu
                         enabled = addReservationState != AddReservationState.Loading && selectedRoomId != null && title.isNotBlank(),
                         modifier = Modifier
                             .fillMaxSize()
@@ -226,17 +277,10 @@ fun AddReservation(navController: NavController) {
                             fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
                         )
                     }
-
                 }
-
-                item {
-                    if (addReservationState is AddReservationState.Loading) {
-                        CircularProgressIndicator()
-                    }
-                }
-
             }
 
+            // --- PRZYCISK POWROTU ---
             Button(
                 onClick = { navController.navigate(Screen.RESERVATION.route) },
                 modifier = Modifier

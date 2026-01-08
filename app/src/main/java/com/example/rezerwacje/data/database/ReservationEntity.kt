@@ -11,9 +11,10 @@ import java.time.LocalDateTime
 data class ReservationEntity(
     @PrimaryKey(autoGenerate = false)
     val id: Int,
-    val name: String,
+    val title: String,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     val nextTriggerAt: Long? = null,
-    val alarmState: AlarmState = AlarmState.PENDING
+    val alarmState: AlarmState = AlarmState.PENDING,
+    val roomId: Int
 )
