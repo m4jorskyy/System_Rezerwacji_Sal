@@ -8,6 +8,7 @@ import com.example.rezerwacje.ui.screen.AddReservation
 import com.example.rezerwacje.ui.screen.AddRoomsScreen
 import com.example.rezerwacje.ui.screen.EditReservationScreen
 import com.example.rezerwacje.ui.screen.EditRoomScreen
+import com.example.rezerwacje.ui.screen.GoogleConnectScreen
 import com.example.rezerwacje.ui.screen.HomeScreen
 import com.example.rezerwacje.ui.screen.LoginScreen
 import com.example.rezerwacje.ui.screen.RegisterScreen
@@ -69,6 +70,9 @@ fun AppNavigation(navController: NavHostController) {
             val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
 
             StatsDetailsScreen(navController, type, id)
+        }
+        composable(Screen.GOOGLE.route){
+            GoogleConnectScreen(navController)
         }
     }
 }

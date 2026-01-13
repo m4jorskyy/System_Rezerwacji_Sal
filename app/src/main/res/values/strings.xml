@@ -44,4 +44,5 @@
     <string name="no_rooms_available">No rooms available</string>
     <string name="reservation_added">Reservation addedd successfully</string>
     <string name="show_stats">Show stats</string>
+    <string name="google">Connect with Google Calendar</string>
 </resources>

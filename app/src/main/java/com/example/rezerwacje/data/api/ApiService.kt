@@ -5,6 +5,7 @@ import com.example.rezerwacje.data.model.AddReservationResponse
 import com.example.rezerwacje.data.model.AddRoomRequest
 import com.example.rezerwacje.data.model.AddRoomResponse
 import com.example.rezerwacje.data.model.GlobalStats
+import com.example.rezerwacje.data.model.GoogleAuthRequest
 import com.example.rezerwacje.data.model.LoginRequest
 import com.example.rezerwacje.data.model.LoginResponse
 import com.example.rezerwacje.data.model.RegisterRequest
@@ -155,4 +156,7 @@ interface ApiService {
         @Path("id") userId: Int,
         @Header("Authorization") token: String
     ): List<UserStats>
+
+    @POST("api/google/auth/")
+    suspend fun sendGoogleCode(@Body request: GoogleAuthRequest): retrofit2.Response<Unit>
 }
